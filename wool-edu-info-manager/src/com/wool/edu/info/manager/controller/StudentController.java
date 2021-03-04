@@ -7,8 +7,9 @@ import com.wool.edu.info.manager.service.StudentService;
 import java.util.Scanner;
 
 public class StudentController {
+    private StudentService studentService = new StudentService();
+    private Scanner sc = new Scanner(System.in);
     public void start() {
-        Scanner sc = new Scanner(System.in);
         lo1:while(true) {
             System.out.println("--------Welcome to <Student> Manager System--------");
             System.out.println("Input to Select: 1.Insert  2.Delete  3.Update  4.Query  5.Exit");
@@ -18,13 +19,13 @@ public class StudentController {
                     addStudent();
                     break;
                 case "2":
-
+                    deleteStudentById();
                     break;
                 case "3":
 
                     break;
                 case "4":
-
+                    queryStudent();
                     break;
                 case "5":
                     System.out.println("Back to Main Menu");
@@ -34,13 +35,43 @@ public class StudentController {
         }
     }
 
-    private void addStudent() {
+    private void deleteStudentById() {
+        studentService.deleteStudentById();
     }
 
-    private void addstudent() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Please input the student id");
-        String id = sc.next();
+    private void queryStudent() {
+        Student[] stus = studentService.queryStudent();
+        if(stus == null){
+            System.out.println("There is no information");
+            return;
+        }
+        System.out.println("Id\t\tName\tAge\tBirthday");
+        for (int i = 0; i < stus.length; i++) {
+            Student stu = stus[i];
+            if(stu != null){
+                System.out.println(stu.getId() + "\t" + stu.getName() + "\t" + stu.getAge() + "\t\t" + stu.getBirth());
+            }
+            else{
+                break;
+            }
+        }
+    }
+
+
+    private void addStudent() {
+        String id;
+        while(true){
+            System.out.println("Please input the student id");
+            id = sc.next();
+            boolean exist = false;
+            exist = studentService.isExist(id);
+            if(exist){
+                System.out.println("This id have been existed, please input another one");
+            }
+            else{
+                break;
+            }
+        }
         System.out.println("Please input the student name");
         String name = sc.next();
         System.out.println("Please input the student age");
@@ -48,7 +79,6 @@ public class StudentController {
         System.out.println("Please input the student birthday");
         String birth = sc.next();
         Student stu = new Student(id, name, age, birth);
-        StudentService studentService = new StudentService();
         boolean result = studentService.addStudent(stu);
         if(result){
             System.out.println("Insert Success");
